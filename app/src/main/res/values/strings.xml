@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Sunset</string>
+    <string name="sun">Sun</string>
+    <string name="sky">Sky</string>
+    <string name="sea">Sea</string>
+</resources>
