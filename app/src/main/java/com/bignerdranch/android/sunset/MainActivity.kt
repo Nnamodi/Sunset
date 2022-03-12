@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private val nightSkyColor: Int by lazy {
         ContextCompat.getColor(this, R.color.night_sky)
     }
+    private var sunUp = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +32,8 @@ class MainActivity : AppCompatActivity() {
         sunView = findViewById(R.id.sun)
         skyView = findViewById(R.id.sky)
         sceneView.setOnClickListener {
-            startAnimation()
+            if (sunUp) { startAnimation() }
+            else { reverseAnimation() }
         }
     }
 
@@ -58,6 +60,34 @@ class MainActivity : AppCompatActivity() {
             .with(sunsetSkyAnimator)
             .before(nightSkyAnimator)
         animatorSet.start()
+        sunUp = false
         Log.d("Anim...", "$sunYStart")
+    }
+
+    /** Based on a challenge. **/
+    private fun reverseAnimation() {
+        val sunYStart = skyView.height.toFloat()
+        val sunYEnd = 301.0f
+        val heightAnimator = ObjectAnimator
+            .ofFloat(sunView, "y", sunYStart, sunYEnd)
+            .setDuration(3000)
+        heightAnimator.interpolator = AccelerateInterpolator()
+
+        val sunriseSkyAnimator = ObjectAnimator
+            .ofInt(skyView, "backgroundColor", sunsetSkyColor, blueSkyColor)
+            .setDuration(3000)
+        sunriseSkyAnimator.setEvaluator(ArgbEvaluator())
+
+        val blueSkyAnimator = ObjectAnimator
+            .ofInt(skyView, "backgroundColor", nightSkyColor, sunsetSkyColor)
+            .setDuration(1500)
+        blueSkyAnimator.setEvaluator(ArgbEvaluator())
+
+        val animatorSet = AnimatorSet()
+        animatorSet.play(heightAnimator)
+            .with(sunriseSkyAnimator)
+            .after(blueSkyAnimator)
+        animatorSet.start()
+        sunUp = true
     }
 }
