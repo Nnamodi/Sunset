@@ -14,8 +14,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sceneView: View
     private lateinit var sunView: View
     private lateinit var skyView: View
-    private lateinit var sunReflection: View
-    private lateinit var seaView: View
     private val blueSkyColor: Int by lazy {
         ContextCompat.getColor(this, R.color.blue_sky)
     }
@@ -26,7 +24,6 @@ class MainActivity : AppCompatActivity() {
         ContextCompat.getColor(this, R.color.night_sky)
     }
     private var initialPos = 0f
-    private var reflectPos = 0f
     private var sunUp = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,8 +32,6 @@ class MainActivity : AppCompatActivity() {
         sceneView = findViewById(R.id.scene)
         sunView = findViewById(R.id.sun)
         skyView = findViewById(R.id.sky)
-        sunReflection = findViewById(R.id.sun_reflection)
-        seaView = findViewById(R.id.sea)
         sceneView.setOnClickListener {
             if (sunUp) { startAnimation() }
             else { reverseAnimation() }
@@ -46,10 +41,7 @@ class MainActivity : AppCompatActivity() {
     private fun startAnimation() {
         val sunYStart = sunView.top.toFloat()
         val sunYEnd = skyView.height.toFloat()
-        val sunReflectYStart = sunReflection.top.toFloat()
-        val sunReflectYEnd = seaView.height.toFloat()
         initialPos = sunYStart
-        reflectPos = sunReflectYStart
         val heightAnimator = ObjectAnimator
             .ofFloat(sunView, "y", sunYStart, sunYEnd)
             .setDuration(3000)
@@ -65,15 +57,9 @@ class MainActivity : AppCompatActivity() {
             .setDuration(1500)
         nightSkyAnimator.setEvaluator(ArgbEvaluator())
 
-        val sunReflectionAnimator = ObjectAnimator
-            .ofFloat(sunReflection, "y", sunReflectYStart, -sunReflectYEnd)
-            .setDuration(4500)
-        sunReflectionAnimator.interpolator = AccelerateInterpolator()
-
         val animatorSet = AnimatorSet()
         animatorSet.play(heightAnimator)
             .with(sunsetSkyAnimator)
-            .with(sunReflectionAnimator)
             .before(nightSkyAnimator)
         animatorSet.start()
         sunUp = false
@@ -84,8 +70,6 @@ class MainActivity : AppCompatActivity() {
     private fun reverseAnimation() {
         val sunYStart = skyView.height.toFloat()
         val sunYEnd = initialPos
-        val sunReflectYStart = seaView.height.toFloat()
-        val sunReflectYEnd = reflectPos
         val heightAnimator = ObjectAnimator
             .ofFloat(sunView, "y", sunYStart, sunYEnd)
             .setDuration(3000)
@@ -101,15 +85,9 @@ class MainActivity : AppCompatActivity() {
             .setDuration(1500)
         blueSkyAnimator.setEvaluator(ArgbEvaluator())
 
-        val sunReflectionAnimator = ObjectAnimator
-            .ofFloat(sunReflection, "y", -sunReflectYStart, sunReflectYEnd)
-            .setDuration(4000)
-        sunReflectionAnimator.interpolator = AccelerateInterpolator()
-
         val animatorSet = AnimatorSet()
         animatorSet.play(heightAnimator)
             .with(sunriseSkyAnimator)
-            .with(sunReflectionAnimator)
             .after(blueSkyAnimator)
         animatorSet.start()
         sunUp = true
